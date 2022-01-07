@@ -15,6 +15,14 @@ const board = (function () {
     return cells[cell]
   }
 
+  const getCells = () => {
+    return cells
+  }
+
+  const setCells = newCells => {
+    cells = newCells
+  }
+
   const clear = () => {
     cells = [null, null, null, null, null, null, null, null, null]
   }
@@ -64,9 +72,10 @@ const board = (function () {
     }
 
     if (cells.reduce((result, current) => result && current, true)) return 'tie'
+    return null
   }
 
-  return { place, getCell, checkResult, clear }
+  return { place, getCell, checkResult, clear, getCells, setCells }
 })()
 
 const uiController = (function () {
@@ -95,7 +104,7 @@ const uiController = (function () {
   }
 
   const isAI = player => {
-    return document.querySelector(`#playerai${player}`).checked ? 0 : 1
+    return document.querySelector(`#playerai${player}`).checked
   }
 
   const setCurrentTurn = player => {
@@ -126,6 +135,10 @@ const gameController = (function () {
       if (winner) {
         uiController.showWinner(winner)
         uiController.setCurrentTurn(null)
+      } else {
+        if (players[currentMove].isAI) {
+          makeAIMove(currentMove)
+        }
       }
     }
   }
@@ -139,9 +152,42 @@ const gameController = (function () {
     }
     currentMove = uiController.getBeginner()
     uiController.setCurrentTurn(currentMove + 1)
+    if (players[currentMove].isAI) {
+      makeAIMove()
+    }
   }
 
-  return { cellClicked, start }
+  const decideAIMove = (targetPlayer, nextMoveBy) => {
+    const result = board.checkResult()
+    if (result) {
+      return { result: result === 'tie' ? 0 : result === targetPlayer ? 1 : -1, cell: 0 }
+    }
+    const cells = board.getCells()
+    let best = { result: targetPlayer === players[nextMoveBy] ? -1 : 1, cell: 0 }
+    for (let i = 0; i < 9; i++) {
+      if (!cells[i]) {
+        const newCells = cells.slice()
+        newCells[i] = players[nextMoveBy]
+        board.setCells(newCells)
+        const current = decideAIMove(targetPlayer, nextMoveBy ? 0 : 1)
+        if ((targetPlayer === players[nextMoveBy] && current.result > best.result) ||
+          (targetPlayer !== players[nextMoveBy] && current.result < best.result)) {
+          best = current
+          best.cell = i
+        }
+      }
+    }
+    board.setCells(cells)
+    return best
+  }
+
+  const makeAIMove = () => {
+    const move = decideAIMove(players[currentMove], currentMove)
+    cellClicked(move.cell)
+    console.log(move)
+  }
+
+  return { cellClicked, start, makeAIMove }
 })()
 
 document.querySelectorAll('.cell').forEach(button => {
