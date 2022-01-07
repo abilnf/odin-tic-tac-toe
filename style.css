@@ -32,11 +32,15 @@ body {
 }
 
 .player-customizer {
-  background-color: red;
+  background-color: rgb(51, 51, 51);
   padding: 8px 8px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.player-customizer--turn {
+  background-color: grey;
 }
 
 .flex-container {
@@ -103,7 +107,7 @@ input[type=checkbox] {
 .playername {
   text-align: center;
   align-self: center;
-  background-color: red;
+  background-color: transparent;
   border: 0;
   font-size: 32px;
   width: 300px;

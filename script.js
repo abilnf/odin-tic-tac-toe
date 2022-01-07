@@ -98,7 +98,16 @@ const uiController = (function () {
     return document.querySelector(`#playerai${player}`).checked ? 0 : 1
   }
 
-  return { updateBoard, getPlayerName, getBeginner, showWinner, isAI }
+  const setCurrentTurn = player => {
+    for (let i = 1; i <= 2; i++) {
+      document.querySelector(`#player-customizer${i}`).classList.remove('player-customizer--turn')
+    }
+    if (player) {
+      document.querySelector(`#player-customizer${player}`).classList.add('player-customizer--turn')
+    }
+  }
+
+  return { updateBoard, getPlayerName, getBeginner, showWinner, isAI, setCurrentTurn }
 })()
 
 const gameController = (function () {
@@ -110,11 +119,13 @@ const gameController = (function () {
     if (board.checkResult()) return
     if (board.place(players[currentMove], cell)) {
       currentMove = currentMove ? 0 : 1
+      uiController.setCurrentTurn(currentMove + 1)
       uiController.updateBoard()
 
       const winner = board.checkResult()
       if (winner) {
         uiController.showWinner(winner)
+        uiController.setCurrentTurn(null)
       }
     }
   }
@@ -127,6 +138,7 @@ const gameController = (function () {
       players[i].isAI = uiController.isAI(i + 1)
     }
     currentMove = uiController.getBeginner()
+    uiController.setCurrentTurn(currentMove + 1)
   }
 
   return { cellClicked, start }
