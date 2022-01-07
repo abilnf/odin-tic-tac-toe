@@ -1,9 +1,9 @@
-function Player(symbol, name, isComputer) {
-  return { symbol, name, isComputer }
+function Player(symbol, name, isAI) {
+  return { symbol, name, isAI }
 }
 
 const board = (function () {
-  const cells = [null, null, null, null, null, null, null, null, null]
+  let cells = [null, null, null, null, null, null, null, null, null]
 
   const place = (player, cell) => {
     if (cells[cell]) return false
@@ -13,6 +13,10 @@ const board = (function () {
 
   const getCell = (cell) => {
     return cells[cell]
+  }
+
+  const clear = () => {
+    cells = [null, null, null, null, null, null, null, null, null]
   }
 
   const checkResult = () => {
@@ -62,20 +66,39 @@ const board = (function () {
     if (cells.reduce((result, current) => result && current, true)) return 'tie'
   }
 
-  return { place, getCell, checkResult }
+  return { place, getCell, checkResult, clear }
 })()
 
 const uiController = (function () {
   const updateBoard = () => {
     for (let i = 0; i < 9; i++) {
       let player = board.getCell(i)
-      if (player) {
-        document.getElementById(`${i}`).textContent = player.symbol
-      }
+      document.getElementById(`${i}`).textContent = player ? player.symbol : ''
     }
   }
 
-  return { updateBoard }
+  const getPlayerName = player => {
+    return document.querySelector(`#playername${player}`).value
+  }
+
+  const getBeginner = () => {
+    return document.querySelector(`#playerstart1`).checked ? 0 : 1
+  }
+
+  const showWinner = winner => {
+    if (winner === 'tie') {
+      document.querySelector('#winnername').textContent = `It's a tie!`
+    } else {
+      document.querySelector('#winnername').textContent = `${winner.name} Won! Congrats!`
+    }
+    document.querySelector('.modal-container').classList.toggle('modal-container--hidden')
+  }
+
+  const isAI = player => {
+    return document.querySelector(`#playerai${player}`).checked ? 0 : 1
+  }
+
+  return { updateBoard, getPlayerName, getBeginner, showWinner, isAI }
 })()
 
 const gameController = (function () {
@@ -84,22 +107,29 @@ const gameController = (function () {
   let currentMove = 0
 
   const cellClicked = cell => {
+    if (board.checkResult()) return
     if (board.place(players[currentMove], cell)) {
       currentMove = currentMove ? 0 : 1
       uiController.updateBoard()
 
       const winner = board.checkResult()
       if (winner) {
-        console.log(winner)
-        if (winner === 'TIE') {
-        } else {
-
-        }
+        uiController.showWinner(winner)
       }
     }
   }
 
-  return { cellClicked }
+  const start = () => {
+    board.clear()
+    uiController.updateBoard()
+    for (let i = 0; i < 2; i++) {
+      players[i].name = uiController.getPlayerName(i + 1)
+      players[i].isAI = uiController.isAI(i + 1)
+    }
+    currentMove = uiController.getBeginner()
+  }
+
+  return { cellClicked, start }
 })()
 
 document.querySelectorAll('.cell').forEach(button => {
@@ -107,3 +137,17 @@ document.querySelectorAll('.cell').forEach(button => {
     gameController.cellClicked(button.getAttribute('id'))
   })
 })
+
+document.querySelector('#start').addEventListener('click', e => {
+  gameController.start()
+})
+
+document.querySelector('.modal-container').addEventListener('click', function (e) {
+  this.classList.toggle('modal-container--hidden')
+})
+
+window.addEventListener('load', e => {
+  document.querySelector('body').classList.toggle('preload')
+})
+
+gameController.start()

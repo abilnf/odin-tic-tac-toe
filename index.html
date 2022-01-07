@@ -10,22 +10,64 @@
   <script src="script.js" defer></script>
 </head>
 
-<body>
-  <div id="board">
-    <div class="row">
-      <button class="cell" id="0"></button>
-      <button class="cell" id="1"></button>
-      <button class="cell" id="2"></button>
+<body class="preload">
+  <div class="modal-container modal-container--hidden">
+    <div class="modal">
+      <h1 id="winnername">Nils WON! Congrats!</h1>
     </div>
-    <div class="row">
-      <button class="cell" id="3"></button>
-      <button class="cell" id="4"></button>
-      <button class="cell" id="5"></button>
+  </div>
+  <div class="player-customizer">
+    <input class="playername" type="text" id="playername1" value="Player ONE">
+    <div class="flex-container">
+      <h3>AI:</h3>
+      <label class="switch">
+        <input id="playerai1" type="checkbox">
+        <span class="slider"></span>
+      </label>
     </div>
-    <div class="row">
-      <button class="cell" id="6"></button>
-      <button class="cell" id="7"></button>
-      <button class="cell" id="8"></button>
+    <div class="flex-container">
+      <label for="playerstart1">
+        <h3>Beginner: </h3>
+      </label>
+      <input type="radio" name="playerstart" id="playerstart1" checked>
+    </div>
+  </div>
+  <div class="middle-column">
+    <button id="start">FIGHT!</button>
+    <div id="board">
+      <div class="row">
+        <button class="cell" id="0"></button>
+        <button class="cell" id="1"></button>
+        <button class="cell" id="2"></button>
+      </div>
+      <div class="row">
+        <button class="cell" id="3"></button>
+        <button class="cell" id="4"></button>
+        <button class="cell" id="5"></button>
+      </div>
+      <div class="row">
+        <button class="cell" id="6"></button>
+        <button class="cell" id="7"></button>
+        <button class="cell" id="8"></button>
+      </div>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="player-customizer">
+    <input class="playername" type="text" id="playername2" value="Computer">
+    <div class="flex-container">
+      <h3>AI:</h3>
+      <label class="switch">
+        <input id="playerai2" type="checkbox" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="flex-container">
+      <label for="playerstart2">
+        <h3>Beginner: </h3>
+      </label>
+      <input type="radio" name="playerstart" id="playerstart2">
     </div>
   </div>
 </body>
